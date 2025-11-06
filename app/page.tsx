@@ -31,6 +31,8 @@ export default function Game() {
   const [showStartScreen, setShowStartScreen] = useState(true)
   const [showGameOver, setShowGameOver] = useState(false)
   const [showPauseScreen, setShowPauseScreen] = useState(false)
+  const [bannerMessage, setBannerMessage] = useState<string>('')
+  const [showBanner, setShowBanner] = useState(false)
 
   const playerRef = useRef<Position>({ x: 0, y: -GAME_HEIGHT / 2 + 50 })
   const bulletsRef = useRef<Position[]>([])
@@ -39,7 +41,27 @@ export default function Game() {
   const keysRef = useRef<{ [key: string]: boolean }>({})
   const lastShotTimeRef = useRef(0)
   const animationFrameRef = useRef<number>()
+  const previousScoreRef = useRef(0)
   const SHOT_COOLDOWN = 200
+
+  // Encouraging messages
+  const encouragingMessages = [
+    "Great shot! 🎯",
+    "Keep it up! ⚡",
+    "You're on fire! 🔥",
+    "Amazing! 🌟",
+    "Incredible! 💫",
+    "Unstoppable! 🚀",
+    "Perfect aim! 🎯",
+    "You're a star! ⭐",
+    "Outstanding! 👏",
+    "Fantastic! 🎉",
+    "Legendary! 🏆",
+    "Masterful! 🎮",
+    "Epic skills! 💪",
+    "Dominating! 👑",
+    "Unbeatable! 🥇"
+  ]
 
   // Initialize stars
   useEffect(() => {
@@ -146,6 +168,15 @@ export default function Game() {
     }
   }
 
+  const showEncouragingBanner = (message: string) => {
+    setBannerMessage(message)
+    setShowBanner(true)
+    // Auto-hide after 2.5 seconds
+    setTimeout(() => {
+      setShowBanner(false)
+    }, 2500)
+  }
+
   const checkCollisions = () => {
     if (!gameRunning || gamePaused) return
 
@@ -160,7 +191,17 @@ export default function Game() {
         if (distance < 20) {
           bulletsRef.current.splice(i, 1)
           enemiesRef.current.splice(j, 1)
-          setScore(prev => prev + 10)
+          setScore(prev => {
+            const newScore = prev + 10
+            // Show encouraging banner at score milestones
+            const previousScore = previousScoreRef.current
+            if (newScore > 0 && newScore % 50 === 0 && newScore !== previousScore) {
+              const randomMessage = encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)]
+              showEncouragingBanner(randomMessage)
+            }
+            previousScoreRef.current = newScore
+            return newScore
+          })
           break
         }
       }
@@ -307,6 +348,8 @@ export default function Game() {
     setShowStartScreen(false)
     setShowGameOver(false)
     setShowPauseScreen(false)
+    setShowBanner(false)
+    previousScoreRef.current = 0
     playerRef.current = { x: 0, y: -GAME_HEIGHT / 2 + 50 }
     bulletsRef.current = []
     enemiesRef.current = []
@@ -339,13 +382,29 @@ export default function Game() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      <div className="relative">
+      <div className="relative flex items-center">
         <canvas
           ref={canvasRef}
           width={GAME_WIDTH}
           height={GAME_HEIGHT}
           className="border-2 border-cyan-400 shadow-[0_0_20px_rgba(0,255,255,0.5)] bg-black"
         />
+        
+        {/* Encouraging Banner - Right side */}
+        {showBanner && gameRunning && !gamePaused && (
+          <div className="ml-6 w-64 animate-slide-in-right">
+            <div className="bg-gradient-to-r from-cyan-500/90 to-blue-500/90 backdrop-blur-sm border-2 border-cyan-400 rounded-lg p-4 shadow-[0_0_20px_rgba(0,255,255,0.6)]">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
+                  {bannerMessage}
+                </p>
+                <p className="text-lg text-cyan-100 mt-2 font-semibold">
+                  Score: {score}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* UI Overlay */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
