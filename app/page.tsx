@@ -381,8 +381,9 @@ export default function Game() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
-      <div className="relative flex items-center">
+    <div className="relative flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+      {/* Game Board Container - Fixed Position */}
+      <div className="relative" style={{ width: GAME_WIDTH, height: GAME_HEIGHT }}>
         <canvas
           ref={canvasRef}
           width={GAME_WIDTH}
@@ -390,23 +391,7 @@ export default function Game() {
           className="border-2 border-cyan-400 shadow-[0_0_20px_rgba(0,255,255,0.5)] bg-black"
         />
         
-        {/* Encouraging Banner - Right side */}
-        {showBanner && gameRunning && !gamePaused && (
-          <div className="ml-6 w-64 animate-slide-in-right">
-            <div className="bg-gradient-to-r from-cyan-500/90 to-blue-500/90 backdrop-blur-sm border-2 border-cyan-400 rounded-lg p-4 shadow-[0_0_20px_rgba(0,255,255,0.6)]">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
-                  {bannerMessage}
-                </p>
-                <p className="text-lg text-cyan-100 mt-2 font-semibold">
-                  Score: {score}
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* UI Overlay */}
+        {/* UI Overlay - Inside game board */}
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
           <div className="absolute top-5 left-5 text-2xl font-bold text-green-400 bg-black/50 px-5 py-2 rounded">
             Score: {score}
@@ -415,70 +400,86 @@ export default function Game() {
             Health: {health}
           </div>
         </div>
-
-        {/* Start Screen */}
-        {showStartScreen && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
-            <div className="bg-black/90 p-10 rounded-lg border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,255,0.5)] text-center">
-              <h1 className="text-5xl mb-5 text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,255,0.8)]">
-                Space Shooter
-              </h1>
-              <p className="text-lg mb-2 text-white">Use WASD or Arrow Keys to move</p>
-              <p className="text-lg mb-2 text-white">Press SPACE to shoot</p>
-              <p className="text-lg mb-5 text-white">Press ESC to pause</p>
-              <button
-                onClick={startGame}
-                className="mt-5 px-8 py-4 text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-black rounded-lg cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,255,255,0.4)] hover:scale-105 hover:shadow-[0_6px_20px_rgba(0,255,255,0.6)] active:scale-95"
-              >
-                Start Game
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Game Over Screen */}
-        {showGameOver && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
-            <div className="bg-black/90 p-10 rounded-lg border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,255,0.5)] text-center">
-              <h1 className="text-5xl mb-5 text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,255,0.8)]">
-                Game Over
-              </h1>
-              <p className="text-lg mb-2 text-white">
-                Final Score: <span className="text-3xl font-bold text-green-400">{score}</span>
-              </p>
-              <button
-                onClick={restartGame}
-                className="mt-5 px-8 py-4 text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-black rounded-lg cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,255,255,0.4)] hover:scale-105 hover:shadow-[0_6px_20px_rgba(0,255,255,0.6)] active:scale-95"
-              >
-                Start New Game
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* Pause Screen */}
-        {showPauseScreen && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-auto">
-            <div className="bg-black/90 p-10 rounded-lg border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,255,0.5)] text-center">
-              <h1 className="text-5xl mb-5 text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,255,0.8)]">
-                Paused
-              </h1>
-              <button
-                onClick={resumeGame}
-                className="block w-full mt-5 px-8 py-4 text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-black rounded-lg cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,255,255,0.4)] hover:scale-105 hover:shadow-[0_6px_20px_rgba(0,255,255,0.6)] active:scale-95"
-              >
-                Resume
-              </button>
-              <button
-                onClick={quitGame}
-                className="block w-full mt-3 px-8 py-4 text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-black rounded-lg cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,255,255,0.4)] hover:scale-105 hover:shadow-[0_6px_20px_rgba(0,255,255,0.6)] active:scale-95"
-              >
-                Quit Game
-              </button>
-            </div>
-          </div>
-        )}
       </div>
+      
+      {/* Encouraging Banner - Fixed position on right side, outside game board */}
+      {showBanner && gameRunning && !gamePaused && (
+        <div className="absolute right-8 top-1/2 transform -translate-y-1/2 w-64 animate-slide-in-right z-10">
+          <div className="bg-gradient-to-r from-cyan-500/90 to-blue-500/90 backdrop-blur-sm border-2 border-cyan-400 rounded-lg p-4 shadow-[0_0_20px_rgba(0,255,255,0.6)]">
+            <div className="text-center">
+              <p className="text-2xl font-bold text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.8)]">
+                {bannerMessage}
+              </p>
+              <p className="text-lg text-cyan-100 mt-2 font-semibold">
+                Score: {score}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Start Screen */}
+      {showStartScreen && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-20">
+          <div className="bg-black/90 p-10 rounded-lg border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,255,0.5)] text-center">
+            <h1 className="text-5xl mb-5 text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,255,0.8)]">
+              Space Shooter
+            </h1>
+            <p className="text-lg mb-2 text-white">Use WASD or Arrow Keys to move</p>
+            <p className="text-lg mb-2 text-white">Press SPACE to shoot</p>
+            <p className="text-lg mb-5 text-white">Press ESC to pause</p>
+            <button
+              onClick={startGame}
+              className="mt-5 px-8 py-4 text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-black rounded-lg cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,255,255,0.4)] hover:scale-105 hover:shadow-[0_6px_20px_rgba(0,255,255,0.6)] active:scale-95"
+            >
+              Start Game
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Game Over Screen */}
+      {showGameOver && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-20">
+          <div className="bg-black/90 p-10 rounded-lg border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,255,0.5)] text-center">
+            <h1 className="text-5xl mb-5 text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,255,0.8)]">
+              Game Over
+            </h1>
+            <p className="text-lg mb-2 text-white">
+              Final Score: <span className="text-3xl font-bold text-green-400">{score}</span>
+            </p>
+            <button
+              onClick={restartGame}
+              className="mt-5 px-8 py-4 text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-black rounded-lg cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,255,255,0.4)] hover:scale-105 hover:shadow-[0_6px_20px_rgba(0,255,255,0.6)] active:scale-95"
+            >
+              Start New Game
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Pause Screen */}
+      {showPauseScreen && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-20">
+          <div className="bg-black/90 p-10 rounded-lg border-2 border-cyan-400 shadow-[0_0_30px_rgba(0,255,255,0.5)] text-center">
+            <h1 className="text-5xl mb-5 text-cyan-400 drop-shadow-[0_0_10px_rgba(0,255,255,0.8)]">
+              Paused
+            </h1>
+            <button
+              onClick={resumeGame}
+              className="block w-full mt-5 px-8 py-4 text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-black rounded-lg cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,255,255,0.4)] hover:scale-105 hover:shadow-[0_6px_20px_rgba(0,255,255,0.6)] active:scale-95"
+            >
+              Resume
+            </button>
+            <button
+              onClick={quitGame}
+              className="block w-full mt-3 px-8 py-4 text-lg font-bold bg-gradient-to-r from-cyan-400 to-blue-500 text-black rounded-lg cursor-pointer transition-all duration-300 shadow-[0_4px_15px_rgba(0,255,255,0.4)] hover:scale-105 hover:shadow-[0_6px_20px_rgba(0,255,255,0.6)] active:scale-95"
+            >
+              Quit Game
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
